@@ -18,35 +18,6 @@ Option Explicit
 Private objSheet As Worksheet
 
 '''
-'@param strTitle 検索対象とするリンクのタイトルを指定する。
-'@return Range 条件に合致する行の Range オブジェクトを返す。
-'''
-Private Function findByTitle(strTitle As String) As Range
-    Dim lngRow As Long
-    Dim boolResult As Boolean
-
-    lngRow = 1
-    boolResult = False
-
-    With objSheet.Range("B3")
-        While .Cells(lngRow, 1).Value <> ""
-            If .Cells(lngRow, 1).Value = strTitle Then
-                Set findByTitle = .Cells(lngRow, 1)
-                boolResult = True
-                GoTo finally
-            End If
-
-            lngRow = lngRow + 1
-        Wend
-    End With
-
-finally:
-    If boolResult = False Then
-        MsgBox strTitle & " は見つかりませんでした。"
-    End If
-End Function
-
-'''
 'フォームを閉じる。
 '''
 Private Sub btnClose_Click()
@@ -71,41 +42,29 @@ Private Sub btnCreate_Click()
         .url = Me.txtUrl
     End With
 
-    With objSheet.Range("B2")
-        If .Cells(2, 1).Value = "" Then
-            .Cells(2, 1).Value = objLink.title
-            .Cells(2, 2).Formula = objLink.link
-            .Cells(2, 3).Value = objLink.url
-        ElseIf .Cells(2, 1).Value <> "" Then
-            With .Cells(1, 1).End(xlDown)
-                .Cells(2, 1).Value = objLink.title
-                .Cells(2, 2).Formula = objLink.link
-                .Cells(2, 3).Value = objLink.url
-            End With
-        End If
-    End With
-
-    Me.lstTitle.AddItem objLink.title
+    Dim objLc As CrudRepository
+    Set objLc = New LinksController
+    objLc.createRecord objLink
 End Sub
 
 '''
 'リンクデータを削除する。
 '''
 Private Sub btnDelete_Click()
-    Dim objRange As Range
+    Dim objLink As link
+    Dim objLc As CrudRepository
 
     With Me
-        If .lstTitle <> "" Then
-            Set objRange = findByTitle(Me.lstTitle)
-
-            If objRange Is Nothing = False Then
-                objRange.EntireRow.Delete
-                .lstTitle.RemoveItem .lstTitle.ListIndex
-
-                .lstTitle.Value = ""
-                .txtUrl = ""
-            End If
+        If .lstTitle.Value = "" Then
+            MsgBox "Title を入力してください。"
+            Exit Sub
         End If
+
+        Set objLink = New link
+        objLink.title = .lstTitle
+
+        Set objLc = New LinksController
+        objLc.deleteRecord objLink
     End With
 End Sub
 
@@ -114,16 +73,20 @@ End Sub
 'フォームの URL 入力欄へ URL を入力する。
 '''
 Private Sub btnFindByTitle_Click()
-    Dim objLink As link
+    Dim objLc As CrudRepository
     Dim objRange As Range
 
     With Me
-        If .lstTitle <> "" Then
-            Set objRange = findByTitle(.lstTitle)
+        If .lstTitle.Value = "" Then
+            MsgBox "Title を入力してください。"
+            Exit Sub
+        End If
 
-            If objRange Is Nothing = False Then
-                .txtUrl = objRange.Cells(1, 3).Value
-            End If
+        Set objLc = New LinksController
+        Set objRange = objLc.findByTitle(.lstTitle)
+
+        If objRange Is Nothing = False Then
+            .txtUrl = objRange.Cells(1, 3).Value
         End If
     End With
 End Sub
@@ -134,24 +97,20 @@ End Sub
 Private Sub btnUpdate_Click()
     Dim objRange As Range
     Dim objLink As link
+    Dim objLc As CrudRepository
 
     With Me
-        If .lstTitle <> "" Then
-            Set objRange = findByTitle(.lstTitle.Value)
-
-            If objRange Is Nothing = False Then
-                Set objLink = New link
-
-                objLink.title = .lstTitle
-                objLink.url = .txtUrl
-
-                With objRange
-                    .Cells(1, 1).Value = objLink.title
-                    .Cells(1, 2).Formula = objLink.link
-                    .Cells(1, 3).Value = objLink.url
-                End With
-            End If
+        If .lstTitle = "" Or .txtUrl = "" Then
+            MsgBox "Title または URL が入力されていません。"
+            Exit Sub
         End If
+
+        Set objLink = New link
+        objLink.title = .lstTitle
+        objLink.url = .txtUrl
+
+        Set objLc = New LinksController
+        objLc.updateRecord objLink
     End With
 End Sub
 
@@ -183,7 +142,6 @@ Private Sub UserForm_Activate()
         If .Cells(2, 1).Value <> "" Then
             strEndAddr = .Cells(1, 1).End(xlDown).Address
             Set objRange = objSheet.Range(strStartAddr, strEndAddr)
-            Debug.Print objRange.Address(False, False)
 
             If objRange.Address(False, False) = strStartAddr Then
                 Me.lstTitle.AddItem objRange.Value
