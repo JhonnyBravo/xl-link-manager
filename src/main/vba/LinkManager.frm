@@ -15,8 +15,6 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Private objSheet As Worksheet
-
 '''
 'フォームを閉じる。
 '''
@@ -43,6 +41,7 @@ Private Sub btnCreate_Click()
     End With
 
     Dim objLc As CrudRepository
+
     Set objLc = New LinksController
     objLc.createRecord objLink
 End Sub
@@ -86,7 +85,7 @@ Private Sub btnFindByTitle_Click()
         Set objRange = objLc.findByTitle(.lstTitle)
 
         If objRange Is Nothing = False Then
-            .txtUrl = objRange.Cells(1, 3).Value
+            .txtUrl.Value = objRange.Cells(1, 3).Value
         End If
     End With
 End Sub
@@ -100,14 +99,14 @@ Private Sub btnUpdate_Click()
     Dim objLc As CrudRepository
 
     With Me
-        If .lstTitle = "" Or .txtUrl = "" Then
+        If .lstTitle.Value = "" Or .txtUrl.Value = "" Then
             MsgBox "Title または URL が入力されていません。"
             Exit Sub
         End If
 
         Set objLink = New link
-        objLink.title = .lstTitle
-        objLink.url = .txtUrl
+        objLink.title = .lstTitle.Value
+        objLink.url = .txtUrl.Value
 
         Set objLc = New LinksController
         objLc.updateRecord objLink
@@ -122,44 +121,10 @@ Private Sub UserForm_Activate()
     With Me
         .lstTitle.Value = ""
         .txtUrl.Value = ""
-
-        If .lstTitle.ListCount > 0 Then
-            .lstTitle.Clear
-        End If
     End With
 
     'タイトル入力欄のリスト初期化処理
-    Dim objRange As Range
-    Dim varTitles As Variant
-    Dim lngRow As Long
+    Dim objTc As New TitlesController
 
-    Dim strStartAddr As String
-    Dim strEndAddr As String
-
-    strStartAddr = "B3"
-
-    With objSheet.Range("B2")
-        If .Cells(2, 1).Value <> "" Then
-            strEndAddr = .Cells(1, 1).End(xlDown).Address
-            Set objRange = objSheet.Range(strStartAddr, strEndAddr)
-
-            If objRange.Address(False, False) = strStartAddr Then
-                Me.lstTitle.AddItem objRange.Value
-                Exit Sub
-            End If
-
-            varTitles = objRange
-
-            For lngRow = 1 To UBound(varTitles)
-                Me.lstTitle.AddItem varTitles(lngRow, 1)
-            Next
-        End If
-    End With
-End Sub
-
-'''
-'フォームインスタンス生成時の初期化処理
-'''
-Private Sub UserForm_Initialize()
-    Set objSheet = ActiveWorkbook.Sheets("Links")
+    objTc.initTitles
 End Sub
