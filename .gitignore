@@ -11,6 +11,7 @@ Backup of *.doc*
 *.xls
 *.xlsx
 *.xlsm
+*.frx
 
 # Excel temporary
 ~$*.xls*
