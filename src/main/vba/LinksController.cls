@@ -26,13 +26,9 @@ End Sub
 '''
 Private Sub CrudRepository_createRecord(objModel As Object)
     Dim objLink As link
+    Dim objTc As New TitlesController
 
     Set objLink = objModel
-
-    With LinkManager
-        objLink.title = .lstTitle
-        objLink.url = .txtUrl
-    End With
 
     With objSheet.Range("B2")
         If .Cells(2, 1).Value = "" Then
@@ -48,7 +44,7 @@ Private Sub CrudRepository_createRecord(objModel As Object)
         End If
     End With
 
-    LinkManager.lstTitle.AddItem objLink.title
+    objTc.addTitle objLink.title
 End Sub
 
 '''
@@ -59,6 +55,7 @@ End Sub
 Private Sub CrudRepository_deleteRecord(objModel As Object)
     Dim objLink As link
     Dim objRange As Range
+    Dim objTc As TitlesController
 
     Set objLink = objModel
     Set objRange = objSelf.findByTitle(objLink.title)
@@ -66,14 +63,8 @@ Private Sub CrudRepository_deleteRecord(objModel As Object)
     If objRange Is Nothing = False Then
         objRange.EntireRow.Delete
 
-        With LinkManager.lstTitle
-            .RemoveItem .ListIndex
-        End With
-
-        With LinkManager
-            .lstTitle.Value = ""
-            .txtUrl = ""
-        End With
+        Set objTc = New TitlesController
+        objTc.deleteTitle
     End If
 End Sub
 
