@@ -39,18 +39,13 @@ Private Sub btnSearch_Click()
     strWord = Me.txtWord
 
     'IE 起動。
-    Dim objIe As New InternetExplorer
+    Dim objBc As New BrowserController
     Dim objDoc As HTMLDocument
 
-    With objIe
-        .Visible = True
-        .navigate strUrl
-
-        While .Busy = True Or .readyState < READYSTATE_COMPLETE
-            DoEvents
-        Wend
-
-        Set objDoc = .document
+    With objBc
+        .openBrowser strUrl, True
+        .waitForLoading
+        Set objDoc = .getDocument
     End With
 
     'Yahoo 検索画面へ検索ワードを入力して検索ボタンをクリック。
@@ -63,12 +58,9 @@ Private Sub btnSearch_Click()
     Set objButton = objDoc.querySelector("input#srchbtn")
     objButton.Click
 
-    With objIe
-        While .Busy = True Or .readyState < READYSTATE_COMPLETE
-            DoEvents
-        Wend
-
-        Set objDoc = .document
+    With objBc
+        .waitForLoading
+        Set objDoc = .getDocument
     End With
 
     '検索結果のリンク一覧を Excel へ出力する。
@@ -80,12 +72,15 @@ Private Sub btnSearch_Click()
 
     Dim objLc As CrudRepository
     Dim objLink As link
+    Dim strMsg As String
 
     Set objElements = objDoc.getElementsByTagName("a")
     objRegExp.Pattern = "search.yahoo|btoptout.yahoo|cache.yahoofs|javascript"
 
     Set objLc = New LinksController
     objLc.deleteRecordAll
+
+    On Error GoTo catch
 
     For Each objAnchor In objElements
         strHref = objAnchor.getAttribute("href")
@@ -102,9 +97,14 @@ Private Sub btnSearch_Click()
         End If
     Next
 
-    objIe.Quit
-    Set objIe = Nothing
-    MsgBox "完了しました。"
+    strMsg = "完了しました。"
+    GoTo finally
+catch:
+    strMsg = "エラーが発生しました。" & vbCrLf & Err.Description
+    Debug.Print strMsg
+finally:
+    Set objBc = Nothing
+    MsgBox strMsg
 End Sub
 
 '''
