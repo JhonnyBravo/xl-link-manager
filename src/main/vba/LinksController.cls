@@ -25,6 +25,8 @@ End Sub
 '@param objModel 登録対象とする Link オブジェクトを指定する。
 '''
 Private Sub CrudRepository_createRecord(objModel As Object)
+    On Error GoTo catch
+
     Dim objLink As link
     Dim objTc As New TitlesController
 
@@ -44,6 +46,15 @@ Private Sub CrudRepository_createRecord(objModel As Object)
         End If
     End With
 
+    GoTo finally
+catch:
+    Dim strMsg As String
+    strMsg = "エラーが発生しました。" & vbCrLf & Err.Description
+
+    Debug.Print strMsg
+    Debug.Print "Title: " & objLink.title
+    Debug.Print "URL: " & objLink.url
+finally:
     objTc.addTitle objLink.title
 End Sub
 
