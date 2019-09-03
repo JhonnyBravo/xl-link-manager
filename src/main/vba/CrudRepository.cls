@@ -45,3 +45,10 @@ End Sub
 Public Sub deleteRecord(objModel As Object)
 
 End Sub
+
+'''
+'レコードを全件削除する。
+'''
+Public Sub deleteRecordAll()
+
+End Sub
