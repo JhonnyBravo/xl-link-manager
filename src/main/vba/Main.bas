@@ -7,3 +7,10 @@ Option Explicit
 Public Sub openForm()
     LinkManager.Show vbModeless
 End Sub
+
+'''
+'Yahoo 検索用フォームを起動する。
+'''
+Public Sub openYahooSearch()
+    YahooSearch.Show vbModeless
+End Sub
