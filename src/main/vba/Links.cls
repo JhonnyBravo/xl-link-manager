@@ -15,3 +15,10 @@ Option Explicit
 Private Sub btnOpenForm_Click()
     openForm
 End Sub
+
+'''
+'Yahoo 検索用フォームを起動する。
+'''
+Private Sub btnOpenYahooSearch_Click()
+    openYahooSearch
+End Sub
