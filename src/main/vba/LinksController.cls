@@ -69,6 +69,23 @@ Private Sub CrudRepository_deleteRecord(objModel As Object)
 End Sub
 
 '''
+'リンク情報を全件削除する。
+'''
+Private Sub CrudRepository_deleteRecordAll()
+    Dim strRowEnd As String
+    Dim strColEnd As String
+
+    strColEnd = "D3"
+
+    With objSheet.Range("B2")
+        If .Cells(2, 1).Value <> "" Then
+            strRowEnd = .End(xlDown).Address
+            objSheet.Range(strRowEnd, strColEnd).ClearContents
+        End If
+    End With
+End Sub
+
+'''
 '@param strTitle 検索対象とするリンク情報のタイトルを指定する。
 '@return Range 条件に合致するリンク情報を持つ行の Range オブジェクトを返す。
 '''
