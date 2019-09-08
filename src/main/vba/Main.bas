@@ -14,3 +14,10 @@ End Sub
 Public Sub openYahooSearch()
     YahooSearch.Show vbModeless
 End Sub
+
+'''
+'データエクスポート用フォームを起動する。
+'''
+Public Sub openExportLinks()
+    ExportLinks.Show vbModeless
+End Sub
