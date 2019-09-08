@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "LinksController"
+Attribute VB_Name = "XlLinksController"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -95,6 +95,29 @@ Private Sub CrudRepository_deleteRecordAll()
         End If
     End With
 End Sub
+
+'''
+'@return Range レコードを全件取得する。
+'''
+Private Function CrudRepository_findAll() As Range
+    Dim strRowEnd As String
+    Dim strColEnd As String
+
+    strColEnd = "D3"
+
+    With Sheets("Links").Range("B2")
+        If .Cells(2, 1).Value = "" Then
+            Exit Function
+        Else
+            strRowEnd = .End(xlDown).Address
+        End If
+    End With
+
+    Dim objRange As Range
+
+    Set objRange = Sheets("Links").Range(strRowEnd, strColEnd)
+    Set CrudRepository_findAll = objRange
+End Function
 
 '''
 '@param strTitle 検索対象とするリンク情報のタイトルを指定する。
