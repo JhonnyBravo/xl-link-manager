@@ -10,6 +10,13 @@ Attribute VB_Exposed = True
 Option Explicit
 
 '''
+'データエクスポート用フォームを起動する。
+'''
+Private Sub btnOpenExportLinks_Click()
+    openExportLinks
+End Sub
+
+'''
 'リンク編集用フォームを起動する。
 '''
 Private Sub btnOpenForm_Click()
