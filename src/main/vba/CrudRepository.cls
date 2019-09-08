@@ -10,6 +10,13 @@ Attribute VB_Exposed = True
 Option Explicit
 
 '''
+'@return Range レコードを全件取得する。
+'''
+Public Function findAll() As Range
+
+End Function
+
+'''
 'レコードを検索する。
 '
 '@param strTitle 検索対象とするタイトルを指定する。
