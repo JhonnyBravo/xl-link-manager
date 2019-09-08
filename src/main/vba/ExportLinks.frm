@@ -46,57 +46,36 @@ Private Sub btnExport_Click()
     varRecordset = objRange
 
     '外部ファイルへデータをコピーする。
-    Dim lngRow As Long
-
     Dim objCr As CrudRepository
     Dim objLink As link
-
     Dim objFso As New FileSystemObject
 
     Select Case objFso.GetExtensionName(Me.txtPath.Value)
         Case "csv"
             Set objCr = New CsvLinksController
-            objCr.deleteRecordAll
-
-            For lngRow = 1 To UBound(varRecordset)
-                Set objLink = New link
-
-                With objLink
-                    .title = varRecordset(lngRow, 1)
-                    .url = varRecordset(lngRow, 3)
-                End With
-
-                objCr.createRecord objLink
-            Next
         Case "xlsx"
             Set objCr = New XlLinksController2
-            objCr.deleteRecordAll
-
-            For lngRow = 1 To UBound(varRecordset)
-                Set objLink = New link
-
-                With objLink
-                    .title = varRecordset(lngRow, 1)
-                    .url = varRecordset(lngRow, 3)
-                End With
-
-                objCr.createRecord objLink
-            Next
         Case "accdb"
             Set objCr = New AcLinksController
-            objCr.deleteRecordAll
-
-            For lngRow = 1 To UBound(varRecordset)
-                Set objLink = New link
-
-                With objLink
-                    .title = varRecordset(lngRow, 1)
-                    .url = varRecordset(lngRow, 3)
-                End With
-
-                objCr.createRecord objLink
-            Next
+        Case Else
+            MsgBox "不正なファイル出力形式です。 Type を確認してください。"
+            Exit Sub
     End Select
+
+    objCr.deleteRecordAll
+
+    Dim lngRow As Long
+
+    For lngRow = 1 To UBound(varRecordset)
+        Set objLink = New link
+
+        With objLink
+            .title = varRecordset(lngRow, 1)
+            .url = varRecordset(lngRow, 3)
+        End With
+
+        objCr.createRecord objLink
+    Next
 
     MsgBox "完了しました。"
 End Sub
